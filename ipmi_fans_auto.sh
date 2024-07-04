@@ -71,20 +71,19 @@ temp_thresh_drive_crit=55
 ## EXAMPLES: 0x00 = 0% duty cycle, 0x32 = 50%, 0x64 = 100%
 # NOTE: 'cool' cycles are for when temperatures are below 'hot1' thresholds
 #
-### CPU FAN ZONE DUTY CYCLES - FANA - device 0x01
-fan_cpu_zone_cool='30'
-fan_cpu_zone_hot1='44'
-fan_cpu_zone_hot2='58'
-fan_cpu_zone_hot3='72'
-fan_cpu_zone_crit='86'
-#
-### PERIPHERAL FAN ZONE DUTY CYCLES - FAN1234 - device 0x00
-fan_peri_zone_cool='30'
-fan_peri_zone_hot1='44'
-fan_peri_zone_hot2='58'
-fan_peri_zone_hot3='72'
-fan_peri_zone_crit='86'
+# CPU FAN ZONE DUTY CYCLES - FANA - device 0x01
+fan_cpu_zone_cool='35'
+fan_cpu_zone_hot1='50'
+fan_cpu_zone_hot2='65'
+fan_cpu_zone_hot3='80'
+fan_cpu_zone_crit='90'
 
+# PERIPHERAL FAN ZONE DUTY CYCLES - FAN1234 - device 0x00
+fan_peri_zone_cool='35'
+fan_peri_zone_hot1='50'
+fan_peri_zone_hot2='65'
+fan_peri_zone_hot3='80'
+fan_peri_zone_crit='90'
 
 ##### DRIVES SELECTION
 # 
