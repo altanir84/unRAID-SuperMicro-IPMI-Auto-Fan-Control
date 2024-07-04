@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Script tailored to work with Supermicro X10SLM-F motherboard, with HDD and Chassis fans connected
+# to FAN1234 and CPU fan connected to FANA
+# HDD and chassis fans are Scythe KazeFlex II PWM fans - specs: max 1800 RPM +- 10% | min 300 rpm +- 20%
+
 #arrayStarted=true
 #clearLog=true
 #noParity=false
@@ -66,19 +71,19 @@ temp_thresh_drive_crit=55
 ## EXAMPLES: 0x00 = 0% duty cycle, 0x32 = 50%, 0x64 = 100%
 # NOTE: 'cool' cycles are for when temperatures are below 'hot1' thresholds
 #
-### CPU FAN ZONE DUTY CYCLES 
-fan_cpu_zone_cool='0x04'
-fan_cpu_zone_hot1='0x08'
-fan_cpu_zone_hot2='0x16'
-fan_cpu_zone_hot3='0x20'
-fan_cpu_zone_crit='0x28'
+### CPU FAN ZONE DUTY CYCLES - FANA - device 0x01
+fan_cpu_zone_cool='30'
+fan_cpu_zone_hot1='44'
+fan_cpu_zone_hot2='58'
+fan_cpu_zone_hot3='72'
+fan_cpu_zone_crit='86'
 #
-### PERIPHERAL FAN ZONE DUTY CYCLES 
-fan_peri_zone_cool='0x04'
-fan_peri_zone_hot1='0x08'
-fan_peri_zone_hot2='0x16'
-fan_peri_zone_hot3='0x20'
-fan_peri_zone_crit='0x28'
+### PERIPHERAL FAN ZONE DUTY CYCLES - FAN1234 - device 0x00
+fan_peri_zone_cool='30'
+fan_peri_zone_hot1='44'
+fan_peri_zone_hot2='58'
+fan_peri_zone_hot3='72'
+fan_peri_zone_crit='86'
 
 
 ##### DRIVES SELECTION
@@ -97,7 +102,7 @@ fan_peri_zone_crit='0x28'
 ### DRIVES TO IGNORE
 ## example: list_drives_ignored=("disk1" "parity" "parity2" "flash")
 ## to include all drives, just set this line to: list_drives_ignored=()
-list_drives_ignored=("flash" "cache_nvme")
+list_drives_ignored=("flash" "cache")
 
 
 ##### CPU PACKAGE TEMPERATURE SENSORS 
@@ -169,6 +174,10 @@ fi
 declare -a list_drive_names
 while IFS='= ' read var val
 do
+  # shellcheck disable=SC1072
+  # shellcheck disable=SC1020
+  # shellcheck disable=SC1009
+  # shellcheck disable=SC1073
   if [[ $var == \[*] ]]
   then
     section=${var:2:-2}
@@ -241,18 +250,22 @@ fi
 # Determine the fan speeds to set
 # CPU zone speed is always determined by CPU threshold
 new_cpu_fan_speed=$found_cpu_threshold
+
 # Peripheral zone gets set to the greater of the thresholds found
 new_peri_fan_speed="$(get_max_number $found_cpu_threshold $found_disk_threshold)"
 
-# Apply the fan speeds
-if [[ $new_cpu_fan_speed == 4 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_cpu_zone_crit; fi
-if [[ $new_cpu_fan_speed == 3 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_cpu_zone_hot3; fi
-if [[ $new_cpu_fan_speed == 2 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_cpu_zone_hot2; fi
-if [[ $new_cpu_fan_speed == 1 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_cpu_zone_hot1; fi
-if [[ $new_cpu_fan_speed == 0 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_cpu_zone_cool; fi
+# Apply the CPU fan speeds - FANA - 0x01
+if [[ $new_cpu_fan_speed == 4 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_cpu_zone_crit; fi
+if [[ $new_cpu_fan_speed == 3 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_cpu_zone_hot3; fi
+if [[ $new_cpu_fan_speed == 2 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_cpu_zone_hot2; fi
+if [[ $new_cpu_fan_speed == 1 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_cpu_zone_hot1; fi
+if [[ $new_cpu_fan_speed == 0 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_cpu_zone_cool; fi
+
 sleep 1
-if [[ $new_peri_fan_speed == 4 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_peri_zone_crit; fi
-if [[ $new_peri_fan_speed == 3 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_peri_zone_hot3; fi
-if [[ $new_peri_fan_speed == 2 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_peri_zone_hot2; fi
-if [[ $new_peri_fan_speed == 1 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_peri_zone_hot1; fi
-if [[ $new_peri_fan_speed == 0 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x01 $fan_peri_zone_cool; fi
+
+# Apply the HDD/Chassis fan speeds - FAN1234 - 0x00
+if [[ $new_peri_fan_speed == 4 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_peri_zone_crit; fi
+if [[ $new_peri_fan_speed == 3 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_peri_zone_hot3; fi
+if [[ $new_peri_fan_speed == 2 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_peri_zone_hot2; fi
+if [[ $new_peri_fan_speed == 1 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_peri_zone_hot1; fi
+if [[ $new_peri_fan_speed == 0 ]]; then ipmitool raw 0x30 0x70 0x66 0x01 0x00 $fan_peri_zone_cool; fi
