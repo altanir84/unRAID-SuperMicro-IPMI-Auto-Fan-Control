@@ -118,13 +118,68 @@ list_drives_ignored=("flash" "cache")
 #
 # To add MORE than 4 CPU sensors, you must add additional cpu#temp variables below 
 #    and also add the new variables into the cputemps array below the list
-#
+
+###### UNRAID "sensors -j" output #####
+#root@UNRAID:~# sensors -j
+ #{
+ #   "coretemp-isa-0000":{
+ #      "Adapter": "ISA adapter",
+ #      "Package id 0":{
+ #         "temp1_input": 35.000,
+ #         "temp1_max": 80.000,
+ #         "temp1_crit": 100.000,
+ #         "temp1_crit_alarm": 0.000
+ #      },
+ #      "Core 0":{
+ #         "temp2_input": 35.000,
+ #         "temp2_max": 80.000,
+ #         "temp2_crit": 100.000,
+ #         "temp2_crit_alarm": 0.000
+ #      },
+ #      "Core 1":{
+ #         "temp3_input": 32.000,
+ #         "temp3_max": 80.000,
+ #         "temp3_crit": 100.000,
+ #         "temp3_crit_alarm": 0.000
+ #      },
+ #      "Core 2":{
+ #         "temp4_input": 33.000,
+ #         "temp4_max": 80.000,
+ #         "temp4_crit": 100.000,
+ #         "temp4_crit_alarm": 0.000
+ #      },
+ #      "Core 3":{
+ #         "temp5_input": 31.000,
+ #         "temp5_max": 80.000,
+ #         "temp5_crit": 100.000,
+ #         "temp5_crit_alarm": 0.000
+ #      }
+ #   },
+ #   "pch_haswell-virtual-0":{
+ #      "Adapter": "Virtual device",
+ #      "temp1":{
+ #         "temp1_input": 50.000
+ #      }
+ #   },
+ #   "acpitz-acpi-0":{
+ #      "Adapter": "ACPI interface",
+ #      "temp1":{
+ #         "temp1_input": 27.800,
+ #         "temp1_crit": 105.000
+ #      },
+ #      "temp2":{
+ #         "temp2_input": 29.800,
+ #         "temp2_crit": 105.000
+ #      }
+ #   }
+ #}
+
 ## example: cpu0temp=$(sensors -j | jq '. | {temp1_input: ."coretemp-isa-0000"."Package id 0".temp1_input}' | awk 'match($0,/\"temp1_input\": ([0-9]+)/,a){print a[1]}')
-cpu0temp=$(sensors -j | jq '. | {temp1_input: ."coretemp-isa-0000"."Package id 0".temp1_input}' | awk 'match($0,/"temp1_input": ([0-9]+)/,a){print a[1]}')
-cpu1temp=$(sensors -j | jq '. | {temp1_input: ."coretemp-isa-0001"."Package id 1".temp1_input}' | awk 'match($0,/"temp1_input": ([0-9]+)/,a){print a[1]}')
-cpu2temp=$(sensors -j | jq '. | {temp1_input: ."coretemp-isa-0002"."Package id 2".temp1_input}' | awk 'match($0,/"temp1_input": ([0-9]+)/,a){print a[1]}')
-cpu3temp=$(sensors -j | jq '. | {temp1_input: ."coretemp-isa-0003"."Package id 3".temp1_input}' | awk 'match($0,/"temp1_input": ([0-9]+)/,a){print a[1]}')
-#
+cpu0temp=$(sensors -j | jq '. | {temp2_input: ."coretemp-isa-0000"."Core 0".temp2_input}' | awk 'match($0,/"temp2_input": ([0-9]+)/,a){print a[1]}')
+cpu1temp=$(sensors -j | jq '. | {temp3_input: ."coretemp-isa-0000"."Core 1".temp3_input}' | awk 'match($0,/"temp3_input": ([0-9]+)/,a){print a[1]}')
+cpu2temp=$(sensors -j | jq '. | {temp4_input: ."coretemp-isa-0000"."Core 2".temp4_input}' | awk 'match($0,/"temp4_input": ([0-9]+)/,a){print a[1]}')
+cpu3temp=$(sensors -j | jq '. | {temp5_input: ."coretemp-isa-0000"."Core 3".temp5_input}' | awk 'match($0,/"temp5_input": ([0-9]+)/,a){print a[1]}')
+
 cputemps=($cpu0temp $cpu1temp $cpu2temp $cpu3temp)
 
 
@@ -136,7 +191,9 @@ get_max_number() {
 }
 
 # Gets the maximum CPU package temp
+# shellcheck disable=SC2068
 echo "CPU temps found: " ${cputemps[@]}
+# shellcheck disable=SC2068
 maxcputemp="$(get_max_number ${cputemps[@]})"
 echo "Max CPU Package temp determined: " $maxcputemp
 
