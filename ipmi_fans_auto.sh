@@ -76,14 +76,14 @@ fan_cpu_zone_cool='35'
 fan_cpu_zone_hot1='50'
 fan_cpu_zone_hot2='65'
 fan_cpu_zone_hot3='80'
-fan_cpu_zone_crit='90'
+fan_cpu_zone_crit='95'
 
 # PERIPHERAL FAN ZONE DUTY CYCLES - FAN1234 - device 0x00
 fan_peri_zone_cool='35'
 fan_peri_zone_hot1='50'
 fan_peri_zone_hot2='65'
 fan_peri_zone_hot3='80'
-fan_peri_zone_crit='90'
+fan_peri_zone_crit='95'
 
 ##### DRIVES SELECTION
 # 
@@ -101,7 +101,7 @@ fan_peri_zone_crit='90'
 ### DRIVES TO IGNORE
 ## example: list_drives_ignored=("disk1" "parity" "parity2" "flash")
 ## to include all drives, just set this line to: list_drives_ignored=()
-list_drives_ignored=("flash" "cache")
+list_drives_ignored=("flash" "cache" "cache2")
 
 
 ##### CPU PACKAGE TEMPERATURE SENSORS 
