@@ -54,9 +54,9 @@ temp_thresh_cpu_hot3=75
 temp_thresh_cpu_crit=80
 #
 ### DRIVE TEMP THRESHOLDS
-temp_thresh_drive_hot1=45
-temp_thresh_drive_hot2=48
-temp_thresh_drive_hot3=51
+temp_thresh_drive_hot1=42
+temp_thresh_drive_hot2=45
+temp_thresh_drive_hot3=50
 temp_thresh_drive_crit=55
 
 
