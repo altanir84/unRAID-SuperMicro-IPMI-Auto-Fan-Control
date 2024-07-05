@@ -54,7 +54,7 @@ temp_thresh_cpu_hot3=75
 temp_thresh_cpu_crit=80
 #
 ### DRIVE TEMP THRESHOLDS
-temp_thresh_drive_hot1=42
+temp_thresh_drive_hot1=40
 temp_thresh_drive_hot2=45
 temp_thresh_drive_hot3=50
 temp_thresh_drive_crit=55
@@ -238,6 +238,7 @@ do
   then
     section=${var:2:-2}
 	#echo ${section}
+	# shellcheck disable=SC2199
 	if [[ ! " ${list_drives_ignored[@]} " =~ " ${section} " ]]; then
       list_drive_names+=($section)
       eval declare -A ${section}_data
@@ -272,6 +273,7 @@ do
   fi
 done
 echo "Active drive temps found: " ${list_drives_temps[*]}
+# shellcheck disable=SC2068
 maxdisktemp="$(get_max_number ${list_drives_temps[@]})"
 echo "Max drive temp determined: " $maxdisktemp
 
